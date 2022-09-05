@@ -10,6 +10,7 @@
             "includePath": [
                 "/home/sierra117/Documents/PlatformIO/Projects/EagleEye/include",
                 "/home/sierra117/Documents/PlatformIO/Projects/EagleEye/src",
+                "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/config",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
@@ -208,7 +209,6 @@
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/USB/src",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
-                "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
                 "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
@@ -219,6 +219,7 @@
                 "path": [
                     "/home/sierra117/Documents/PlatformIO/Projects/EagleEye/include",
                     "/home/sierra117/Documents/PlatformIO/Projects/EagleEye/src",
+                    "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/config",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
@@ -417,7 +418,6 @@
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/USB/src",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
-                    "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
                     "/home/sierra117/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
@@ -442,7 +442,7 @@
                 "ARDUINO=10812",
                 "ARDUINO_VARIANT=\"esp32\"",
                 "ARDUINO_BOARD=\"AI Thinker ESP32-CAM\"",
-                "ARDUINO_PARTITION_default",
+                "ARDUINO_PARTITION_no_ota",
                 ""
             ],
             "cStandard": "c99",

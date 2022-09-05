@@ -1,15 +1,28 @@
-#include <Arduino.h>
 #include "esp_camera.h"
 #include <WiFi.h>
 #define CAMERA_MODEL_AI_THINKER
-
+#define Relay 2
+#define Red 13
+#define Green 12
 #include "camera_pins.h"
 #include "cred.h"
 
 void startCameraServer();
 
+boolean matchFace = false;
+boolean activateRelay = false;
+long prevMillis = 0;
+int interval = 5000;
+
 void setup()
 {
+  pinMode(Relay, OUTPUT);
+  pinMode(Red, OUTPUT);
+  pinMode(Green, OUTPUT);
+  digitalWrite(Relay, LOW);
+  digitalWrite(Red, HIGH);
+  digitalWrite(Green, LOW);
+
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -34,38 +47,19 @@ void setup()
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
-  config.frame_size = FRAMESIZE_UXGA;
-  config.pixel_format = PIXFORMAT_JPEG; // for streaming
-  // config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
-  config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
-  config.fb_location = CAMERA_FB_IN_PSRAM;
-  config.jpeg_quality = 12;
-  config.fb_count = 1;
-
-  // if PSRAM IC present, init with UXGA resolution and higher JPEG quality
-  //                      for larger pre-allocated frame buffer.
-  if (config.pixel_format == PIXFORMAT_JPEG)
+  config.pixel_format = PIXFORMAT_JPEG;
+  // init with high specs to pre-allocate larger buffers
+  if (psramFound())
   {
-    if (psramFound())
-    {
-      config.jpeg_quality = 10;
-      config.fb_count = 2;
-      config.grab_mode = CAMERA_GRAB_LATEST;
-    }
-    else
-    {
-      // Limit the frame size when PSRAM is not available
-      config.frame_size = FRAMESIZE_SVGA;
-      config.fb_location = CAMERA_FB_IN_DRAM;
-    }
+    config.frame_size = FRAMESIZE_UXGA;
+    config.jpeg_quality = 10;
+    config.fb_count = 2;
   }
   else
   {
-    // Best option for face detection/recognition
-    config.frame_size = FRAMESIZE_240X240;
-#if CONFIG_IDF_TARGET_ESP32S3
-    config.fb_count = 2;
-#endif
+    config.frame_size = FRAMESIZE_SVGA;
+    config.jpeg_quality = 12;
+    config.fb_count = 1;
   }
 
 #if defined(CAMERA_MODEL_ESP_EYE)
@@ -86,26 +80,18 @@ void setup()
   if (s->id.PID == OV3660_PID)
   {
     s->set_vflip(s, 1);       // flip it back
-    s->set_brightness(s, 1);  // up the brightness just a bit
+    s->set_brightness(s, 1);  // up the blightness just a bit
     s->set_saturation(s, -2); // lower the saturation
   }
   // drop down frame size for higher initial frame rate
-  if (config.pixel_format == PIXFORMAT_JPEG)
-  {
-    s->set_framesize(s, FRAMESIZE_QVGA);
-  }
+  s->set_framesize(s, FRAMESIZE_QVGA);
 
-#if defined(CAMERA_MODEL_M5STACK_WIDE) || defined(CAMERA_MODEL_M5STACK_ESP32CAM)
+#if defined(CAMERA_MODEL_M5STACK_WIDE)
   s->set_vflip(s, 1);
   s->set_hmirror(s, 1);
 #endif
 
-#if defined(CAMERA_MODEL_ESP32S3_EYE)
-  s->set_vflip(s, 1);
-#endif
-
   WiFi.begin(ssid, password);
-  WiFi.setSleep(false);
 
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -124,6 +110,20 @@ void setup()
 
 void loop()
 {
-  // Do nothing. Everything is done in another task by the web server
-  delay(10000);
+  if (matchFace == true && activateRelay == false)
+  {
+    activateRelay = true;
+    digitalWrite(Relay, HIGH);
+    digitalWrite(Green, HIGH);
+    digitalWrite(Red, LOW);
+    prevMillis = millis();
+  }
+  if (activateRelay == true && millis() - prevMillis > interval)
+  {
+    activateRelay = false;
+    matchFace = false;
+    digitalWrite(Relay, LOW);
+    digitalWrite(Green, LOW);
+    digitalWrite(Red, HIGH);
+  }
 }

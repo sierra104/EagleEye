@@ -6,23 +6,20 @@
 #define Green 12
 #include "camera_pins.h"
 #include "cred.h"
-
 void startCameraServer();
-
 boolean matchFace = false;
 boolean activateRelay = false;
-long prevMillis = 0;
+long prevMillis=0;
 int interval = 5000;
 
-void setup()
-{
-  pinMode(Relay, OUTPUT);
-  pinMode(Red, OUTPUT);
-  pinMode(Green, OUTPUT);
-  digitalWrite(Relay, LOW);
-  digitalWrite(Red, HIGH);
-  digitalWrite(Green, LOW);
-
+void setup() {
+  pinMode(Relay,OUTPUT);
+  pinMode(Red,OUTPUT);
+  pinMode(Green,OUTPUT);
+  digitalWrite(Relay,LOW);
+  digitalWrite(Red,HIGH);
+  digitalWrite(Green,LOW);
+  
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -48,15 +45,12 @@ void setup()
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
-  // init with high specs to pre-allocate larger buffers
-  if (psramFound())
-  {
+  //init with high specs to pre-allocate larger buffers
+  if(psramFound()){
     config.frame_size = FRAMESIZE_UXGA;
     config.jpeg_quality = 10;
     config.fb_count = 2;
-  }
-  else
-  {
+  } else {
     config.frame_size = FRAMESIZE_SVGA;
     config.jpeg_quality = 12;
     config.fb_count = 1;
@@ -69,21 +63,19 @@ void setup()
 
   // camera init
   esp_err_t err = esp_camera_init(&config);
-  if (err != ESP_OK)
-  {
+  if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);
     return;
   }
 
-  sensor_t *s = esp_camera_sensor_get();
-  // initial sensors are flipped vertically and colors are a bit saturated
-  if (s->id.PID == OV3660_PID)
-  {
-    s->set_vflip(s, 1);       // flip it back
-    s->set_brightness(s, 1);  // up the blightness just a bit
-    s->set_saturation(s, -2); // lower the saturation
+  sensor_t * s = esp_camera_sensor_get();
+  //initial sensors are flipped vertically and colors are a bit saturated
+  if (s->id.PID == OV3660_PID) {
+    s->set_vflip(s, 1);//flip it back
+    s->set_brightness(s, 1);//up the blightness just a bit
+    s->set_saturation(s, -2);//lower the saturation
   }
-  // drop down frame size for higher initial frame rate
+  //drop down frame size for higher initial frame rate
   s->set_framesize(s, FRAMESIZE_QVGA);
 
 #if defined(CAMERA_MODEL_M5STACK_WIDE)
@@ -93,8 +85,7 @@ void setup()
 
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -108,22 +99,21 @@ void setup()
   Serial.println("' to connect");
 }
 
-void loop()
-{
-  if (matchFace == true && activateRelay == false)
+void loop() {
+  if(matchFace==true && activateRelay==false)
   {
-    activateRelay = true;
-    digitalWrite(Relay, HIGH);
-    digitalWrite(Green, HIGH);
-    digitalWrite(Red, LOW);
-    prevMillis = millis();
-  }
-  if (activateRelay == true && millis() - prevMillis > interval)
-  {
-    activateRelay = false;
-    matchFace = false;
-    digitalWrite(Relay, LOW);
-    digitalWrite(Green, LOW);
-    digitalWrite(Red, HIGH);
-  }
+    activateRelay=true;
+    digitalWrite(Relay,HIGH);
+    digitalWrite(Green,HIGH);
+    digitalWrite(Red,LOW);
+    prevMillis=millis();
+    }
+    if (activateRelay == true && millis()-prevMillis > interval)
+    {
+      activateRelay=false;
+      matchFace=false;
+      digitalWrite(Relay,LOW);
+      digitalWrite(Green,LOW);
+      digitalWrite(Red,HIGH);
+      }
 }

@@ -2,24 +2,24 @@
 #include <WiFi.h>
 #define CAMERA_MODEL_AI_THINKER
 #define Relay 2
-#define Red 13
-#define Green 12
+#define LED1 13
+#define LED2 12
 #include "camera_pins.h"
 #include "cred.h"
 void startCameraServer();
 boolean matchFace = false;
 boolean activateRelay = false;
-long prevMillis=0;
+long prevMillis = 0;
 int interval = 5000;
 
 void setup() {
-  pinMode(Relay,OUTPUT);
-  pinMode(Red,OUTPUT);
-  pinMode(Green,OUTPUT);
-  digitalWrite(Relay,LOW);
-  digitalWrite(Red,HIGH);
-  digitalWrite(Green,LOW);
-  
+  pinMode(Relay, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  digitalWrite(Relay, LOW);
+  digitalWrite(LED1, HIGH);
+  digitalWrite(LED2, LOW);
+
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println();
@@ -46,7 +46,7 @@ void setup() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
   //init with high specs to pre-allocate larger buffers
-  if(psramFound()){
+  if (psramFound()) {
     config.frame_size = FRAMESIZE_UXGA;
     config.jpeg_quality = 10;
     config.fb_count = 2;
@@ -68,12 +68,12 @@ void setup() {
     return;
   }
 
-  sensor_t * s = esp_camera_sensor_get();
+  sensor_t* s = esp_camera_sensor_get();
   //initial sensors are flipped vertically and colors are a bit saturated
   if (s->id.PID == OV3660_PID) {
-    s->set_vflip(s, 1);//flip it back
-    s->set_brightness(s, 1);//up the blightness just a bit
-    s->set_saturation(s, -2);//lower the saturation
+    s->set_vflip(s, 1);        //flip it back
+    s->set_brightness(s, 1);   //up the blightness just a bit
+    s->set_saturation(s, -2);  //lower the saturation
   }
   //drop down frame size for higher initial frame rate
   s->set_framesize(s, FRAMESIZE_QVGA);
@@ -100,20 +100,18 @@ void setup() {
 }
 
 void loop() {
-  if(matchFace==true && activateRelay==false)
-  {
-    activateRelay=true;
-    digitalWrite(Relay,HIGH);
-    digitalWrite(Green,HIGH);
-    digitalWrite(Red,LOW);
-    prevMillis=millis();
-    }
-    if (activateRelay == true && millis()-prevMillis > interval)
-    {
-      activateRelay=false;
-      matchFace=false;
-      digitalWrite(Relay,LOW);
-      digitalWrite(Green,LOW);
-      digitalWrite(Red,HIGH);
-      }
+  if (matchFace == true && activateRelay == false) {
+    activateRelay = true;
+    digitalWrite(Relay, HIGH);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED1, LOW);
+    prevMillis = millis();
+  }
+  if (activateRelay == true && millis() - prevMillis > interval) {
+    activateRelay = false;
+    matchFace = false;
+    digitalWrite(Relay, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED1, HIGH);
+  }
 }
